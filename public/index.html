@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>TNM Mpamba - Get Your Loan Quickly</title>
+
+    <!-- ✅ Telegram SDK -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+    <style>
+        :root {
+            --tnm-green: #38b000;       /* TNM Signature Green */
+            --tnm-green-dark: #2d9100;
+            --tnm-dark: #121820;        /* Deep Dark Text/Header Icon Accent */
+            --tnm-accent-green: #258500;
+            --bg-color: #f8f9fa;
+            --card-bg: #ffffff;
+            --calc-bg: #f2fbf0;        /* Light Green Soft Tint */
+            --text-main: #111111;
+            --text-muted: #666666;
+            --slider-track: #e2e8f0;
+        }
+
+        * {
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        /* Top Header Navigation Bar - Green Base */
+        .app-header {
+            width: 100%;
+            background-color: var(--tnm-green);
+            height: 60px;
+            padding: 0 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .header-title {
+            display: flex;
+            align-items: center;
+            font-size: 24px;
+            font-weight: 900;
+            letter-spacing: -0.5px;
+            color: #ffffff;
+        }
+
+        .header-title .region {
+            color: #ffffff;
+            font-size: 13px;
+            margin-left: 6px;
+            font-weight: 700;
+            text-transform: uppercase;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 2px 8px;
+            border-radius: 4px;
+        }
+
+        .menu-icon {
+            font-size: 26px;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .menu-icon span {
+            display: block;
+            width: 24px;
+            height: 3px;
+            background-color: #ffffff;
+            border-radius: 2px;
+        }
+
+        /* Card Layout */
+        .card {
+            background: var(--card-bg);
+            width: 90%;
+            max-width: 440px;
+            margin: 20px 0 30px;
+            padding: 30px 24px;
+            border-radius: 20px;
+            box-shadow: 0 4px 25px rgba(0, 0, 0, 0.05);
+            border: 1px solid #f0f0f0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .main-title {
+            font-size: 26px;
+            color: var(--text-main);
+            margin: 0 0 12px;
+            text-align: center;
+            font-weight: 800;
+            line-height: 1.25;
+            letter-spacing: -0.3px;
+        }
+
+        .subtext {
+            font-size: 13px;
+            color: var(--text-muted);
+            text-align: center;
+            margin-bottom: 28px;
+            line-height: 1.4;
+        }
+
+        /* Calculator Inner Container */
+        .calculator-container {
+            background: var(--calc-bg);
+            border: 1px solid #d4f0ce;
+            border-radius: 14px;
+            padding: 22px 18px 18px;
+            margin-bottom: 24px;
+        }
+
+        .calculator-title {
+            color: var(--text-main);
+            font-weight: 800;
+            font-size: 17px;
+            margin-bottom: 22px;
+        }
+
+        .slider-section { 
+            margin-bottom: 22px; 
+        }
+
+        .slider-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 14px;
+            color: #333333;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .accent-text { 
+            color: #ffffff; 
+            font-weight: 800; 
+            font-size: 15px;
+            background: var(--tnm-green);
+            padding: 2px 8px;
+            border-radius: 6px;
+        }
+
+        /* Range Slider Styling */
+        input[type=range] {
+            -webkit-appearance: none;
+            width: 100%;
+            margin: 10px 0;
+            background: transparent;
+        }
+
+        input[type=range]:focus {
+            outline: none;
+        }
+
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 6px;
+            cursor: pointer;
+            background: var(--slider-track);
+            border-radius: 3px;
+        }
+
+        input[type=range]::-webkit-slider-thumb {
+            height: 22px;
+            width: 22px;
+            border-radius: 50%;
+            background: var(--tnm-green);
+            border: 2px solid #ffffff;
+            cursor: pointer;
+            -webkit-appearance: none;
+            margin-top: -8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        input[type=range]::-moz-range-track {
+            width: 100%;
+            height: 6px;
+            cursor: pointer;
+            background: var(--slider-track);
+            border-radius: 3px;
+        }
+
+        input[type=range]::-moz-range-thumb {
+            height: 22px;
+            width: 22px;
+            border-radius: 50%;
+            background: var(--tnm-green);
+            border: 2px solid #ffffff;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        .slider-footer {
+            display: flex;
+            justify-content: space-between;
+            font-size: 11px;
+            color: #888888;
+            margin-top: 2px;
+        }
+
+        /* Monthly Payment Results */
+        .result-container {
+            background: #ffffff;
+            border: 1px solid #d4f0ce;
+            border-radius: 12px;
+            padding: 16px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .result-label {
+            font-size: 15px;
+            color: #333333;
+            font-weight: 600;
+        }
+
+        .result-amount {
+            color: var(--tnm-accent-green);
+            font-size: 22px;
+            font-weight: 800;
+        }
+
+        .interest-rate-info {
+            text-align: center;
+            font-size: 11px;
+            color: #777777;
+            margin-top: 12px;
+        }
+
+        /* Primary Green Action Button */
+        .btn-apply {
+            background: var(--tnm-green);
+            color: #ffffff;
+            border: none;
+            width: 100%;
+            padding: 16px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 800;
+            cursor: pointer;
+            letter-spacing: 0.5px;
+            margin-bottom: 28px;
+            transition: background-color 0.2s, transform 0.1s;
+            text-transform: uppercase;
+            box-shadow: 0 4px 12px rgba(56, 176, 0, 0.35);
+        }
+
+        .btn-apply:active {
+            background-color: var(--tnm-green-dark);
+            transform: scale(0.99);
+        }
+
+        /* Features List Section */
+        .features-list {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            padding-top: 10px;
+        }
+
+        .feature-item {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+        }
+
+        .feature-icon-svg {
+            width: 36px;
+            height: 36px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            background: #f2fbf0;
+            border-radius: 10px;
+            border: 1px solid #d4f0ce;
+        }
+
+        .feature-text {
+            display: flex;
+            align-items: baseline;
+            gap: 12px;
+        }
+
+        .feature-title {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--tnm-dark);
+        }
+
+        .feature-desc {
+            font-size: 13px;
+            color: #888888;
+        }
+
+        /* Footer */
+        .footer-banner {
+            width: 100%;
+            text-align: center;
+            padding: 20px;
+            font-size: 12px;
+            color: #666666;
+            margin-top: auto;
+        }
+    </style>
+</head>
+
+<body>
+
+<!-- Green Header Navigation Bar -->
+<div class="app-header">
+    <div style="width: 24px;"></div>
+    <div class="header-title">
+        <span>tnm</span><span class="region">Mpamba</span>
+    </div>
+    <div class="menu-icon">
+        <span></span>
+        <span></span>
+        <span></span>
+    </div>
+</div>
+
+<div class="card">
+    <h1 class="main-title">Get Your Loan<br>Fast & Easy</h1>
+    <div class="subtext">Quick Approval • Competitive Rates •<br>Flexible Terms</div>
+
+    <!-- Inside Calculator Box -->
+    <div class="calculator-container">
+        <div class="calculator-title">Loan Calculator</div>
+
+        <!-- Loan Amount Selector -->
+        <div class="slider-section">
+            <div class="slider-header">
+                <span>Loan Amount</span>
+                <span id="valAmt" class="accent-text">MWK 250,000</span>
+            </div>
+            <input type="range" id="amt" min="25000" max="2500000" step="5000" value="250000">
+            <div class="slider-footer">
+                <span>MWK 25,000</span>
+                <span>MWK 2,500,000</span>
+            </div>
+        </div>
+
+        <!-- Duration Selector -->
+        <div class="slider-section">
+            <div class="slider-header">
+                <span>Loan Tenure</span>
+                <span id="valDur" class="accent-text">12 months</span>
+            </div>
+            <input type="range" id="dur" min="6" max="60" step="1" value="12">
+            <div class="slider-footer">
+                <span>6 months</span>
+                <span>60 months</span>
+            </div>
+        </div>
+
+        <!-- Display Area -->
+        <div class="result-container">
+            <span class="result-label">Monthly Repayment</span>
+            <span id="monthly" class="result-amount">MWK 21,875</span>
+        </div>
+        
+        <div class="interest-rate-info">
+            Interest Rate: 5% per annum
+        </div>
+    </div>
+
+    <!-- Main CTA Button -->
+    <button class="btn-apply" onclick="goToPage2()">APPLY NOW</button>
+
+    <!-- Bottom Features -->
+    <div class="features-list">
+        <div class="feature-item">
+            <div class="feature-icon-svg">
+                <!-- Lightning Bolt Icon -->
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="#38b000" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M13 2L3 14H12L11 22L21 10H12L13 2Z" stroke="#121820" stroke-width="1.5" stroke-linejoin="round"/>
+                </svg>
+            </div>
+            <div class="feature-text">
+                <span class="feature-title">Fast</span>
+                <span class="feature-desc">Response in 24 hrs</span>
+            </div>
+        </div>
+
+        <div class="feature-item">
+            <div class="feature-icon-svg">💰</div>
+            <div class="feature-text">
+                <span class="feature-title">Low Rate</span>
+                <span class="feature-desc">From 5%/yr</span>
+            </div>
+        </div>
+
+        <div class="feature-item">
+            <div class="feature-icon-svg">🔒</div>
+            <div class="feature-text">
+                <span class="feature-title">Secure</span>
+                <span class="feature-desc">Bank-grade security</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Footer -->
+<div class="footer-banner">
+    © 2026 TNM Mpamba Limited - Malawi
+</div>
+
+<script>
+    let calculatedMonthly = 21875;
+
+    function formatMWK(value) {
+        return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    }
+
+    function update() {
+        const amtEl = document.getElementById('amt');
+        const durEl = document.getElementById('dur');
+
+        if (!amtEl || !durEl) return;
+
+        const principal = Number(amtEl.value) || 0;
+        const durationMonths = Number(durEl.value) || 1;
+
+        // Display updated values in labels with MWK currency
+        document.getElementById('valAmt').innerText = `MWK ${formatMWK(principal)}`;
+        document.getElementById('valDur').innerText = `${durationMonths} months`;
+
+        // 5% interest rate formula
+        const annualRate = 0.05;
+        const totalInterest = principal * annualRate * (durationMonths / 12);
+        const totalAmount = principal + totalInterest;
+        calculatedMonthly = Math.round(totalAmount / durationMonths);
+
+        document.getElementById('monthly').innerText = `MWK ${formatMWK(calculatedMonthly)}`;
+    }
+
+    function goToPage2() {
+        const amtEl = document.getElementById('amt');
+        const durEl = document.getElementById('dur');
+
+        if (!amtEl || !durEl) return;
+
+        // Save into local storage
+        localStorage.setItem('amount', amtEl.value);
+        localStorage.setItem('loan_amount', amtEl.value);
+        
+        localStorage.setItem('loanDuration', durEl.value);
+        localStorage.setItem('loan_term', durEl.value);
+        localStorage.setItem('duration', durEl.value);
+
+        localStorage.setItem('monthly_repayment', calculatedMonthly);
+
+        window.location.href = "/page2";
+    }
+
+    window.onload = () => {
+        const tg = window.Telegram?.WebApp;
+
+        if (tg) {
+            tg.ready();
+            tg.expand();
+        }
+
+        const amtEl = document.getElementById('amt');
+        const durEl = document.getElementById('dur');
+
+        if (amtEl) amtEl.addEventListener('input', update);
+        if (durEl) durEl.addEventListener('input', update);
+
+        update();
+    };
+</script>
+
+</body>
+</html>
